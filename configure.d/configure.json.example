@@ -1,0 +1,21 @@
+{
+    "xml_title" : "",
+    "xml_link" : "",
+    "xml_locale" : "",
+    "xml_copyright" : "",
+    "xml_subtitle" : "",
+    "xml_author" : "",
+    "xml_summary" : "",
+    "xml_description" : "",
+    "xml_email" : "",
+    "xml_image" : "",
+    "xml_categories" : [],
+
+    "website_url" : "",
+
+    "ftp_host" : "",
+    "ftp_port" : ,
+    "ftp_user" : "",
+    "ftp_password" : "",
+    "ftp_root_dir" : ""
+}

@@ -1,0 +1,27 @@
+{
+  "name": "podcast-gen",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/manabu0516/podcast-gen.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/manabu0516/podcast-gen/issues"
+  },
+  "homepage": "https://github.com/manabu0516/podcast-gen#readme",
+  "dependencies": {
+    "basic-ftp": "^5.0.2",
+    "ftp": "^0.3.10",
+    "memory-streams": "^0.1.3",
+    "mp3-duration": "^1.1.0",
+    "node-id3": "^0.2.5",
+    "readline-sync": "^1.4.10"
+  }
+}
