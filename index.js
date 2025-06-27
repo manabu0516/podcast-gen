@@ -48,6 +48,14 @@ const createFtpClient = (() => {
             await ftpClient.upload(stream.Readable.from([target]), configure.ftp_root_dir + '/'+ output);
         };
 
+        manager.upload = async (target, output) => {
+            await ftpClient.upload(stream.Readable.from([target]), configure.ftp_root_dir + '/'+ output);
+        };
+
+        manager.uploadFile = async (target, output) => {
+            await ftpClient.upload(target, configure.ftp_root_dir + '/'+ output);
+        };
+
         manager.close = () => {
             return ftpClient.close();
         };

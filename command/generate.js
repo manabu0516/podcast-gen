@@ -24,21 +24,22 @@ const createSummary = (data) => {
 const entryData = (path, configure) => {
     const entries = path.split("__");
 
-    const extention = pathModule.extname(entries[4]);
-    const duration = pathModule.basename(entries[4],extention);
+    const extention = pathModule.extname(entries[5]);
+    const duration = pathModule.basename(entries[5],extention);
 	const url = configure.website_url + path;
 
-	const dateStr = entries[0];
+	const dateStr = entries[1];
 	const pubslished = dateStr.substring(0,4) + '-' + dateStr.substring(4,6) + '-' + dateStr.substring(6,8);
 
     return {
-        index : parseInt(entries[1]),
-        artist : decodeString(entries[2]),
-        music : decodeString(entries[3]),
+        index : parseInt(entries[2]),
+        artist : decodeString(entries[3]),
+        music : decodeString(entries[4]),
         extention : extention,
         duration : parseFloat(duration),
         pubslished : pubslished,
         hash : md5hex(url),
+		image : configure.website_url + entries[0] + '.jpg',
         url : url,
     };
 };
@@ -76,7 +77,7 @@ const writeXML = (config, articles, print) => {
 		print("        <itunes:author>"+a.artist+"</itunes:author>");
 		print("        <itunes:subtitle>"+"</itunes:subtitle>");
 		print("        <itunes:summary><![CDATA["+createSummary(a)+"]]></itunes:summary>");
-		print("        <itunes:image href=\""+"\" />");
+		print("        <itunes:image href=\""+a.image+"\" />");
 		print("        <enclosure url=\""+a.url+"\" />");
 		print("        <guid>"+a.hash+"</guid>");
 		print("        <pubDate>"+a.pubslished+"</pubDate>");
@@ -91,7 +92,7 @@ const writeXML = (config, articles, print) => {
 
 module.exports = async () => {
     return async (context) => {
-        const fileData = (await context.ftpClient.files()).filter(e => e != "podcast.xml");
+        const fileData = (await context.ftpClient.files()).filter(e => e.endsWith(".mp3"));
 
 		const colletion = fileData.map(e => entryData(e, context.configure));
 		
@@ -100,7 +101,5 @@ module.exports = async () => {
 
 		const xml = entries.join("\r\n");
 		await context.ftpClient.upload(xml, "podcast.xml");
-
-		console.log(xml);
     };
 };
