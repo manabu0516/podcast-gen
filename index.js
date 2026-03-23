@@ -10,7 +10,7 @@ const configure = ((target) => {
     const path = require('path');
     const confPath = target;
     const configure = JSON.parse(fs.readFileSync(confPath, 'utf8'));
-    return {configure:configure, dir : path.dirname(confPath), path : confPath};
+    return {configure:configure, dir : path.dirname(confPath), path : dir+'/podcast.xml'};
 })(args[0]);
 
 const convertTime = (totalSeconds) => {
