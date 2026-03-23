@@ -10,7 +10,7 @@ const configure = ((target) => {
     const path = require('path');
     const confPath = target;
     const configure = JSON.parse(fs.readFileSync(confPath, 'utf8'));
-    return {configure:configure, dir : path.dirname(confPath)};
+    return {configure:configure, dir : path.dirname(confPath), path : confPath};
 })(args[0]);
 
 const convertTime = (totalSeconds) => {
@@ -174,7 +174,7 @@ const run = async () => {
         output.push(text);
     });
 
-    console.log(output.join('\r\n'));
+    await fs.writeFile(configure.path, output.join('\r\n'), 'utf8');
 };
 
 run();
