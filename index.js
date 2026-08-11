@@ -159,9 +159,14 @@ const run = async () => {
         entry.duration_disp = convertTime(entry.duration);
         entry.pubslished = convertRSSDate(entry.timestamp);
 
+	
         if(data['webp'] !== undefined) {
             entry.thumbnail = data['webp'].path;
         }
+	if(data['jpg'] !== undefined) {
+	    entry.thumbnail = data['jpg'].path;
+	}
+	
         entries.push(entry);
     }
 

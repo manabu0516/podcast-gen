@@ -16,5 +16,7 @@
     "url": "https://github.com/manabu0516/podcast-gen/issues"
   },
   "homepage": "https://github.com/manabu0516/podcast-gen#readme",
-  "dependencies": {}
+  "dependencies": {
+    "fast-xml-parser": "^5.10.1"
+  }
 }
