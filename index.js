@@ -94,8 +94,8 @@ const writeXML = (config, articles, print) => {
 	});
 
 	articles.forEach(a => {
-        const url = config.webroot + a.mp3file;
-        const image = config.webroot + a.thumbnail;
+        const url = config.webroot + encodeURIComponent(a.mp3file);
+        const image = config.webroot + encodeURIComponent(a.thumbnail);
         const hash = md5hex(url);
         const author = a.author !== undefined && a.author !== null ? a.author : config.xml_author;
 
