@@ -10,7 +10,7 @@ const configure = ((target) => {
     const path = require('path');
     const confPath = target;
     const configure = JSON.parse(fs.readFileSync(confPath, 'utf8'));
-    return {configure:configure, dir : path.dirname(confPath), path :  path.dirname(confPath)+'/podcast.xml'};
+    return {configure:configure, dir : path.dirname(confPath), xmlpath :  path.dirname(confPath)+'/podcast.xml', jsonpath :  path.dirname(confPath)+'/podcast.json'};
 })(args[0]);
 
 const convertTime = (totalSeconds) => {
@@ -62,6 +62,53 @@ const createSummary = (data) => {
     entries.push('('+ fixDuration +'分)');
 
 	return entries.join(''); 
+};
+
+const writeJSON = (config, articles) => {
+
+    const xml_image = config.webroot + 'thumbnail.jpg';
+
+    const result = {};
+    result.rss = {}
+    result.rss.categories = [];
+    result.rss.items = [];
+    result.rss.channel = {
+        title : config.xml_title,
+        link : config.xml_link,
+        language : config.xml_locale,
+        copyright : config.xml_copyright,
+
+        subtitle : config.xml_subtitle,
+        author : config.xml_author,
+        summary : config.xml_summary,
+        description : config.xml_description,
+        owner : {name:config.xml_author, email:config.xml_email},
+        image : xml_image
+    };
+
+    config.xml_categories.forEach(t => {
+		result.rss.categories.categories.push(t);
+	});
+
+	articles.forEach(a => {
+        const url = config.webroot + encodeURIComponent(a.mp3file);
+        const image = config.webroot + encodeURIComponent(a.thumbnail);
+        const hash = md5hex(url);
+        const author = a.author !== undefined && a.author !== null ? a.author : config.xml_author;
+
+        result.rss.items.push({
+            title : a.title,
+            author : author,
+            subtitle : '',
+            summary : createSummary(a),
+            url : url,
+            guid : hash,
+            image : image,
+            pubDate : a.pubslished,
+            duration : a.duration_disp
+        });
+	});
+    return result;
 };
 
 const writeXML = (config, articles, print) => {
@@ -117,7 +164,7 @@ const writeXML = (config, articles, print) => {
 };
 
 const run = async () => {
-    const exlucdeTarget = ['configure.json', 'podcast.xml', 'thumbnail.jpg'];
+    const exlucdeTarget = ['configure.json', 'podcast.xml', 'thumbnail.jpg', 'podcast.json'];
     const fs = require('fs').promises;
 
     const entryMap = {};
@@ -178,8 +225,10 @@ const run = async () => {
     writeXML(configure.configure, entries, (text) => {
         output.push(text);
     });
+    const json = writeJSON(configure.configure, entries);
 
-    await fs.writeFile(configure.path, output.join('\r\n'), 'utf8');
+    await fs.writeFile(configure.xmlpath, output.join('\r\n'), 'utf8');
+    await fs.writeFile(configure.jsonpath, JSON.stringify(json), 'utf8');
 };
 
 run();
