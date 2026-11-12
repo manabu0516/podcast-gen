@@ -12,7 +12,8 @@ const configure = ((target) => {
     const configure = JSON.parse(fs.readFileSync(confPath, 'utf8'));
     return {
         configure:configure, dir : path.dirname(confPath),
-        xmlpath :  path.dirname(confPath)+'/podcast.xml',
+        xmlpath1 :  path.dirname(confPath)+'/podcast.xml',
+        xmlpath2 :  path.dirname(confPath)+'/podcast_intra.xml',
         jsonpath :  path.dirname(confPath)+'/podcast.json',
         m3u8path :  path.dirname(confPath)+'/podcast.m3u8'
     };
@@ -116,11 +117,24 @@ const writeJSON = (config, articles) => {
     return result;
 };
 
-const writeXML = (config, articles, print) => {
+const writeXML1 = (config, articles) => {
+    const output = [];
+    writeXML(config, articles, config.webroot, (text) => {
+        output.push(text);
+    });
+    return output.join('\r\n');
+}
+const writeXML2 = (config, articles) => {
+    const output = [];
+    writeXML(config, articles, config.intraroot, (text) => {
+        output.push(text);
+    });
+    return output.join('\r\n');
+}
 
-	const categories = [];
+const writeXML = (config, articles, webroot, print) => {
 
-    const xml_image = config.webroot + 'thumbnail.jpg';
+    const xml_image = webroot + 'thumbnail.jpg';
 
 	print("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 	print("<rss xmlns:itunes=\"http://www.itunes.com/dtds/podcast-1.0.dtd\" version=\"2.0\">");
@@ -146,8 +160,8 @@ const writeXML = (config, articles, print) => {
 	});
 
 	articles.forEach(a => {
-        const url = config.webroot + encodeURIComponent(a.mp3file);
-        const image = config.webroot + encodeURIComponent(a.thumbnail);
+        const url = webroot + encodeURIComponent(a.mp3file);
+        const image = webroot + encodeURIComponent(a.thumbnail);
         const hash = md5hex(url);
         const author = a.author !== undefined && a.author !== null ? a.author : config.xml_author;
 
@@ -197,7 +211,8 @@ const writeM3U8 = (config, articles, print) => {
 
 
 const run = async () => {
-    const exlucdeTarget = ['configure.json', 'podcast.xml', 'thumbnail.jpg', 'podcast.json', 'podcast.m3u8'];
+    const exlucdeTarget = ['configure.json', 'podcast.xml', 'thumbnail.jpg', 
+        'podcast.json', 'podcast.m3u8', 'podcast_intra.xml'];
     const fs = require('fs').promises;
 
     const entryMap = {};
@@ -254,14 +269,14 @@ const run = async () => {
         return b.timestamp - a.timestamp;
     });
 
-    const output = [];
-    writeXML(configure.configure, entries, (text) => {
-        output.push(text);
-    });
+    const xml1 = writeXML1(configure.configure, entries);
+    const xml2 = writeXML2(configure.configure, entries);
+
     const json = writeJSON(configure.configure, entries);
     const m3u8 = writeM3U8(configure.configure, entries);
 
-    await fs.writeFile(configure.xmlpath, output.join('\r\n'), 'utf8');
+    await fs.writeFile(configure.xmlpath1, xml1, 'utf8');
+    await fs.writeFile(configure.xmlpath2, xml2, 'utf8');
     await fs.writeFile(configure.jsonpath, JSON.stringify(json), 'utf8');
     await fs.writeFile(configure.m3u8path, m3u8, 'utf8');
 };
