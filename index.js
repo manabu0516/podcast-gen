@@ -177,7 +177,7 @@ const writeM3U8 = (config, articles, print) => {
     };
 
 	articles.forEach(a => {
-        const url = /*config.webroot + */ encodeURIComponent(a.mp3file);
+        const url = config.intraroot + encodeURIComponent(a.mp3file);
         context.entries.push('#EXTINF:' + a.duration + ',' + (a.title) + '\r\n' + url);
         if(context.duration < a.duration) {
             context.duration = a.duration;
