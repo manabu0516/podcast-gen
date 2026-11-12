@@ -96,8 +96,8 @@ const writeJSON = (config, articles) => {
 	});
 
 	articles.forEach(a => {
-        const url = config.webroot + encodeURIComponent(a.mp3file);
-        const image = config.webroot + encodeURIComponent(a.thumbnail);
+        const url = encodeURIComponent(a.mp3file);
+        const image = encodeURIComponent(a.thumbnail);
         const hash = md5hex(url);
         const author = a.author !== undefined && a.author !== null ? a.author : config.xml_author;
 
