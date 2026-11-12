@@ -177,7 +177,7 @@ const writeM3U8 = (config, articles, print) => {
     };
 
 	articles.forEach(a => {
-        const url = config.webroot + encodeURIComponent(a.mp3file);
+        const url = /*config.webroot + */ encodeURIComponent(a.mp3file);
         context.entries.push('#EXTINF:' + a.duration + ',' + (a.title) + '\r\n' + url);
         if(context.duration < a.duration) {
             context.duration = a.duration;
@@ -188,7 +188,8 @@ const writeM3U8 = (config, articles, print) => {
     output.push('#EXT-X-MEDIA-SEQUENCE:0');
     output.push('#EXT-X-PLAYLIST-TYPE:VOD');
 
-    context.entries.join('\r\n#EXT-X-DISCONTINUITY\r\n'+)l
+    const text = context.entries.join('\r\n#EXT-X-DISCONTINUITY\r\n');
+    output.push(text);
 
     output.push('#EXT-X-ENDLIST');
     return output.join('\r\n');
