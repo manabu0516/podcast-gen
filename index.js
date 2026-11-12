@@ -92,7 +92,7 @@ const writeJSON = (config, articles) => {
     };
 
     config.xml_categories.forEach(t => {
-		result.rss.categories.categories.push(t);
+		result.rss.categories.push(t);
 	});
 
 	articles.forEach(a => {
@@ -169,7 +169,7 @@ const writeXML = (config, articles, print) => {
 };
 
 const writeM3U8 = (config, articles, print) => {
-	const output = ['#EXTM3U', '#EXT-X-VERSION:3'];
+	const output = ['#EXTM3U', '#EXT-X-VERSION:3', '#PLAYLIST:' + (config.xml_title)];
 
     const context = {
         entries : [],
@@ -178,20 +178,17 @@ const writeM3U8 = (config, articles, print) => {
 
 	articles.forEach(a => {
         const url = config.webroot + encodeURIComponent(a.mp3file);
-        context.entries.push('#EXTINF:' + a.duration + ',' + (a.title))
+        context.entries.push('#EXTINF:' + a.duration + ',' + (a.title) + '\r\n' + url);
         if(context.duration < a.duration) {
             context.duration = a.duration;
         }
-        context.entries.push(url);
 	});
 
     output.push('#EXT-X-TARGETDURATION:' + (context.duration));
     output.push('#EXT-X-MEDIA-SEQUENCE:0');
     output.push('#EXT-X-PLAYLIST-TYPE:VOD');
 
-    context.entries.forEach(a => {
-        output.push(a);
-    });
+    context.entries.join('\r\n#EXT-X-DISCONTINUITY\r\n'+)l
 
     output.push('#EXT-X-ENDLIST');
     return output.join('\r\n');
