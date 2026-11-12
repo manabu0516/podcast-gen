@@ -10,7 +10,12 @@ const configure = ((target) => {
     const path = require('path');
     const confPath = target;
     const configure = JSON.parse(fs.readFileSync(confPath, 'utf8'));
-    return {configure:configure, dir : path.dirname(confPath), xmlpath :  path.dirname(confPath)+'/podcast.xml', jsonpath :  path.dirname(confPath)+'/podcast.json'};
+    return {
+        configure:configure, dir : path.dirname(confPath),
+        xmlpath :  path.dirname(confPath)+'/podcast.xml',
+        jsonpath :  path.dirname(confPath)+'/podcast.json',
+        m3u8path :  path.dirname(confPath)+'/podcast.m3u8'
+    };
 })(args[0]);
 
 const convertTime = (totalSeconds) => {
@@ -163,8 +168,38 @@ const writeXML = (config, articles, print) => {
 	print("</rss>");
 };
 
+const writeM3U8 = (config, articles, print) => {
+	const output = ['#EXTM3U', '#EXT-X-VERSION:3'];
+
+    const context = {
+        entries : [],
+        duration : 0
+    };
+
+	articles.forEach(a => {
+        const url = config.webroot + encodeURIComponent(a.mp3file);
+        context.entries.push('#EXTINF:' + a.duration + ',' + (a.title))
+        if(context.duration < a.duration) {
+            context.duration = a.duration;
+        }
+        context.entries.push(url);
+	});
+
+    output.push('#EXT-X-TARGETDURATION:' + (context.duration));
+    output.push('#EXT-X-MEDIA-SEQUENCE:0');
+    output.push('#EXT-X-PLAYLIST-TYPE:VOD');
+
+    context.entries.forEach(a => {
+        output.push(a);
+    });
+
+    output.push('#EXT-X-ENDLIST');
+    return output.join('\r\n');
+};
+
+
 const run = async () => {
-    const exlucdeTarget = ['configure.json', 'podcast.xml', 'thumbnail.jpg', 'podcast.json'];
+    const exlucdeTarget = ['configure.json', 'podcast.xml', 'thumbnail.jpg', 'podcast.json', 'podcast.m3u8'];
     const fs = require('fs').promises;
 
     const entryMap = {};
@@ -226,9 +261,11 @@ const run = async () => {
         output.push(text);
     });
     const json = writeJSON(configure.configure, entries);
+    const m3u8 = writeM3U8(configure.configure, entries);
 
     await fs.writeFile(configure.xmlpath, output.join('\r\n'), 'utf8');
     await fs.writeFile(configure.jsonpath, JSON.stringify(json), 'utf8');
+    await fs.writeFile(configure.m3u8path, m3u8, 'utf8');
 };
 
 run();
